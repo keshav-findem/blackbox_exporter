@@ -19,7 +19,7 @@ jobs:
   # See https://circleci.com/docs/2.0/faq/#can-i-use-ipv6-in-my-tests for details.
   test-ipv6:
     machine: true
-    working_directory: /home/circleci/.go_workspace/src/github.com/prometheus/blackbox_exporter
+    working_directory: /home/circleci/.go_workspace/src/github.com/keshav-findem/blackbox_exporter
     # Whenever the Go version is updated here, .promu.yml should also be updated.
     environment:
       DOCKER_TEST_IMAGE_NAME: quay.io/prometheus/golang-builder:1.22-base
@@ -35,7 +35,7 @@ jobs:
             }
             EOF
             sudo service docker restart
-      - run: docker run --rm -t -v "$(pwd):/app" "${DOCKER_TEST_IMAGE_NAME}" -i github.com/prometheus/blackbox_exporter -T
+      - run: docker run --rm -t -v "$(pwd):/app" "${DOCKER_TEST_IMAGE_NAME}" -i github.com/keshav-findem/blackbox_exporter -T
 workflows:
   version: 2
   blackbox_exporter:

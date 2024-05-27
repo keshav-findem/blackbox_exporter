@@ -25,7 +25,7 @@ import (
 
 	"github.com/go-kit/log"
 	"github.com/go-kit/log/level"
-	"github.com/prometheus/blackbox_exporter/config"
+	"github.com/keshav-findem/blackbox_exporter/config"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/prometheus/common/expfmt"
@@ -88,6 +88,11 @@ func Handler(w http.ResponseWriter, r *http.Request, c *config.Config, logger lo
 		return
 	}
 
+	query_name := params.Get("query_name")
+	if query_name == "" {
+		query_name = ""
+	}
+
 	prober, ok := Probers[module.Prober]
 	if !ok {
 		http.Error(w, fmt.Sprintf("Unknown prober %q", module.Prober), http.StatusBadRequest)
@@ -116,7 +121,7 @@ func Handler(w http.ResponseWriter, r *http.Request, c *config.Config, logger lo
 	registry := prometheus.NewRegistry()
 	registry.MustRegister(probeSuccessGauge)
 	registry.MustRegister(probeDurationGauge)
-	success := prober(ctx, target, module, registry, sl)
+	success := prober(ctx, target, module, query_name, registry, sl)
 	duration := time.Since(start).Seconds()
 	probeDurationGauge.Set(duration)
 	if success {

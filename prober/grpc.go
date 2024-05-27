@@ -15,9 +15,14 @@ package prober
 
 import (
 	"context"
+	"net"
+	"net/url"
+	"strings"
+	"time"
+
 	"github.com/go-kit/log"
 	"github.com/go-kit/log/level"
-	"github.com/prometheus/blackbox_exporter/config"
+	"github.com/keshav-findem/blackbox_exporter/config"
 	"github.com/prometheus/client_golang/prometheus"
 	pconfig "github.com/prometheus/common/config"
 	"google.golang.org/grpc"
@@ -27,10 +32,6 @@ import (
 	"google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/peer"
 	"google.golang.org/grpc/status"
-	"net"
-	"net/url"
-	"strings"
-	"time"
 )
 
 type GRPCHealthCheck interface {
@@ -74,7 +75,7 @@ func (c *gRPCHealthCheckClient) Check(ctx context.Context, service string) (bool
 	return false, returnStatus.Code(), nil, "", err
 }
 
-func ProbeGRPC(ctx context.Context, target string, module config.Module, registry *prometheus.Registry, logger log.Logger) (success bool) {
+func ProbeGRPC(ctx context.Context, target string, module config.Module, query_name string, registry *prometheus.Registry, logger log.Logger) (success bool) {
 
 	var (
 		durationGaugeVec = prometheus.NewGaugeVec(prometheus.GaugeOpts{

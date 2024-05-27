@@ -2,7 +2,7 @@ go:
     # Whenever the Go version is updated here, .circle/config.yml should also be updated.
     version: 1.22
 repository:
-    path: github.com/prometheus/blackbox_exporter
+    path: github.com/keshav-findem/blackbox_exporter
 build:
     ldflags: |
         -X github.com/prometheus/common/version.Version={{.Version}}

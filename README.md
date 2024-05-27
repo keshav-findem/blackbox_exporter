@@ -11,7 +11,7 @@ HTTP, HTTPS, DNS, TCP, ICMP and gRPC.
 
 ### From binaries
 
-Download the most suitable binary from [the releases tab](https://github.com/prometheus/blackbox_exporter/releases)
+Download the most suitable binary from [the releases tab](https://github.com/keshav-findem/blackbox_exporter/releases)
 
 Then:
 
@@ -79,7 +79,7 @@ Additionally, an [example configuration](example.yml) is also available.
 HTTP, HTTPS (via the `http` prober), DNS, TCP socket, ICMP and gRPC (see permissions section) are currently supported.
 Additional modules can be defined to meet your needs.
 
-The timeout of each probe is automatically determined from the `scrape_timeout` in the [Prometheus config](https://prometheus.io/docs/operating/configuration/#configuration-file), slightly reduced to allow for network delays. 
+The timeout of each probe is automatically determined from the `scrape_timeout` in the [Prometheus config](https://prometheus.io/docs/operating/configuration/#configuration-file), slightly reduced to allow for network delays.
 This can be further limited by the `timeout` in the Blackbox exporter config file. If neither is specified, it defaults to 120 seconds.
 
 ## Prometheus Configuration

@@ -33,7 +33,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 	pconfig "github.com/prometheus/common/config"
 
-	"github.com/prometheus/blackbox_exporter/config"
+	"github.com/keshav-findem/blackbox_exporter/config"
 )
 
 func TestTCPConnection(t *testing.T) {
@@ -55,7 +55,7 @@ func TestTCPConnection(t *testing.T) {
 	testCTX, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	registry := prometheus.NewRegistry()
-	if !ProbeTCP(testCTX, ln.Addr().String(), config.Module{TCP: config.TCPProbe{IPProtocolFallback: true}}, registry, log.NewNopLogger()) {
+	if !ProbeTCP(testCTX, ln.Addr().String(), config.Module{TCP: config.TCPProbe{IPProtocolFallback: true}}, "", registry, log.NewNopLogger()) {
 		t.Fatalf("TCP module failed, expected success.")
 	}
 	<-ch
@@ -66,7 +66,7 @@ func TestTCPConnectionFails(t *testing.T) {
 	registry := prometheus.NewRegistry()
 	testCTX, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	if ProbeTCP(testCTX, ":0", config.Module{TCP: config.TCPProbe{}}, registry, log.NewNopLogger()) {
+	if ProbeTCP(testCTX, ":0", config.Module{TCP: config.TCPProbe{}}, "", registry, log.NewNopLogger()) {
 		t.Fatalf("TCP module suceeded, expected failure.")
 	}
 }
@@ -155,7 +155,7 @@ func TestTCPConnectionWithTLS(t *testing.T) {
 	registry := prometheus.NewRegistry()
 	go serverFunc()
 	// Test name-verification failure (IP without IPs in cert's SAN).
-	if ProbeTCP(testCTX, ln.Addr().String(), module, registry, log.NewNopLogger()) {
+	if ProbeTCP(testCTX, ln.Addr().String(), module, "", registry, log.NewNopLogger()) {
 		t.Fatalf("TCP module succeeded, expected failure.")
 	}
 	<-ch
@@ -164,7 +164,7 @@ func TestTCPConnectionWithTLS(t *testing.T) {
 	go serverFunc()
 	// Test name-verification with name from target.
 	target := net.JoinHostPort("localhost", listenPort)
-	if !ProbeTCP(testCTX, target, module, registry, log.NewNopLogger()) {
+	if !ProbeTCP(testCTX, target, module, "", registry, log.NewNopLogger()) {
 		t.Fatalf("TCP module failed, expected success.")
 	}
 	<-ch
@@ -173,7 +173,7 @@ func TestTCPConnectionWithTLS(t *testing.T) {
 	go serverFunc()
 	// Test name-verification against name from tls_config.
 	module.TCP.TLSConfig.ServerName = "localhost"
-	if !ProbeTCP(testCTX, ln.Addr().String(), module, registry, log.NewNopLogger()) {
+	if !ProbeTCP(testCTX, ln.Addr().String(), module, "", registry, log.NewNopLogger()) {
 		t.Fatalf("TCP module failed, expected success.")
 	}
 	<-ch
@@ -304,7 +304,7 @@ func TestTCPConnectionWithTLSAndVerifiedCertificateChain(t *testing.T) {
 	go serverFunc()
 	// Test name-verification with name from target.
 	target := net.JoinHostPort("localhost", listenPort)
-	if !ProbeTCP(testCTX, target, module, registry, log.NewNopLogger()) {
+	if !ProbeTCP(testCTX, target, module, "", registry, log.NewNopLogger()) {
 		t.Fatalf("TCP module failed, expected success.")
 	}
 	<-ch
@@ -425,7 +425,7 @@ func TestTCPConnectionQueryResponseStartTLS(t *testing.T) {
 
 	// Do the client side of this test.
 	registry := prometheus.NewRegistry()
-	if !ProbeTCP(testCTX, ln.Addr().String(), module, registry, log.NewNopLogger()) {
+	if !ProbeTCP(testCTX, ln.Addr().String(), module, "", registry, log.NewNopLogger()) {
 		t.Fatalf("TCP module failed, expected success.")
 	}
 	<-ch
@@ -477,7 +477,7 @@ func TestTCPConnectionQueryResponseIRC(t *testing.T) {
 		ch <- struct{}{}
 	}()
 	registry := prometheus.NewRegistry()
-	if !ProbeTCP(testCTX, ln.Addr().String(), module, registry, log.NewNopLogger()) {
+	if !ProbeTCP(testCTX, ln.Addr().String(), module, "", registry, log.NewNopLogger()) {
 		t.Fatalf("TCP module failed, expected success.")
 	}
 	<-ch
@@ -496,7 +496,7 @@ func TestTCPConnectionQueryResponseIRC(t *testing.T) {
 		ch <- struct{}{}
 	}()
 	registry = prometheus.NewRegistry()
-	if ProbeTCP(testCTX, ln.Addr().String(), module, registry, log.NewNopLogger()) {
+	if ProbeTCP(testCTX, ln.Addr().String(), module, "", registry, log.NewNopLogger()) {
 		t.Fatalf("TCP module succeeded, expected failure.")
 	}
 	mfs, err := registry.Gather()
@@ -546,7 +546,7 @@ func TestTCPConnectionQueryResponseMatching(t *testing.T) {
 		ch <- version
 	}()
 	registry := prometheus.NewRegistry()
-	if !ProbeTCP(testCTX, ln.Addr().String(), module, registry, log.NewNopLogger()) {
+	if !ProbeTCP(testCTX, ln.Addr().String(), module, "", registry, log.NewNopLogger()) {
 		t.Fatalf("TCP module failed, expected success.")
 	}
 	if got, want := <-ch, "OpenSSH_6.9p1"; got != want {
@@ -598,7 +598,7 @@ func TestTCPConnectionProtocol(t *testing.T) {
 	}
 
 	registry := prometheus.NewRegistry()
-	result := ProbeTCP(testCTX, net.JoinHostPort("localhost", port), module, registry, log.NewNopLogger())
+	result := ProbeTCP(testCTX, net.JoinHostPort("localhost", port), module, "", registry, log.NewNopLogger())
 	if !result {
 		t.Fatalf("TCP protocol: \"tcp\", prefer: \"ip4\" connection test failed, expected success.")
 	}
@@ -619,7 +619,7 @@ func TestTCPConnectionProtocol(t *testing.T) {
 	}
 
 	registry = prometheus.NewRegistry()
-	result = ProbeTCP(testCTX, net.JoinHostPort("localhost", port), module, registry, log.NewNopLogger())
+	result = ProbeTCP(testCTX, net.JoinHostPort("localhost", port), module, "", registry, log.NewNopLogger())
 	if !result {
 		t.Fatalf("TCP protocol: \"tcp\", prefer: \"ip6\" connection test failed, expected success.")
 	}
@@ -638,7 +638,7 @@ func TestTCPConnectionProtocol(t *testing.T) {
 	}
 
 	registry = prometheus.NewRegistry()
-	result = ProbeTCP(testCTX, net.JoinHostPort("localhost", port), module, registry, log.NewNopLogger())
+	result = ProbeTCP(testCTX, net.JoinHostPort("localhost", port), module, "", registry, log.NewNopLogger())
 	if !result {
 		t.Fatalf("TCP protocol: \"tcp\" connection test failed, expected success.")
 	}
@@ -678,7 +678,7 @@ func TestPrometheusTimeoutTCP(t *testing.T) {
 				Expect: config.MustNewRegexp("SSH-2.0-(OpenSSH_6.9p1) Debian-2"),
 			},
 		},
-	}}, registry, log.NewNopLogger()) {
+	}}, "", registry, log.NewNopLogger()) {
 		t.Fatalf("TCP module succeeded, expected timeout failure.")
 	}
 	<-ch

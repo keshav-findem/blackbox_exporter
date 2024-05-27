@@ -1,4 +1,4 @@
-module github.com/prometheus/blackbox_exporter
+module github.com/keshav-findem/blackbox_exporter
 
 go 1.21
 
