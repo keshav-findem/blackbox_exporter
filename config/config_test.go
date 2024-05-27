@@ -45,10 +45,6 @@ func TestLoadBadConfigs(t *testing.T) {
 			want:  "error parsing config file: at most one of bearer_token & bearer_token_file must be configured",
 		},
 		{
-			input: "testdata/invalid-dns-module.yml",
-			want:  "error parsing config file: query name must be set for DNS module",
-		},
-		{
 			input: "testdata/invalid-dns-class.yml",
 			want:  "error parsing config file: query class 'X' is not valid",
 		},

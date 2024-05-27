@@ -365,9 +365,6 @@ func (s *DNSProbe) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	if err := unmarshal((*plain)(s)); err != nil {
 		return err
 	}
-	if s.QueryName == "" {
-		return errors.New("query name must be set for DNS module")
-	}
 	if s.QueryClass != "" {
 		if _, ok := dns.StringToClass[s.QueryClass]; !ok {
 			return fmt.Errorf("query class '%s' is not valid", s.QueryClass)

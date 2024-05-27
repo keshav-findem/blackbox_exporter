@@ -88,9 +88,9 @@ func Handler(w http.ResponseWriter, r *http.Request, c *config.Config, logger lo
 		return
 	}
 
-	query_name := params.Get("query_name")
-	if query_name == "" {
-		query_name = ""
+	queryName := params.Get("query_name")
+	if queryName == "" && moduleName == "dns" {
+		http.Error(w, "query_name must be set for DNS module", http.StatusBadRequest)
 	}
 
 	prober, ok := Probers[module.Prober]
@@ -121,7 +121,7 @@ func Handler(w http.ResponseWriter, r *http.Request, c *config.Config, logger lo
 	registry := prometheus.NewRegistry()
 	registry.MustRegister(probeSuccessGauge)
 	registry.MustRegister(probeDurationGauge)
-	success := prober(ctx, target, module, query_name, registry, sl)
+	success := prober(ctx, target, module, queryName, registry, sl)
 	duration := time.Since(start).Seconds()
 	probeDurationGauge.Set(duration)
 	if success {

@@ -88,7 +88,7 @@ func dialTCP(ctx context.Context, target string, module config.Module, registry 
 	return tls.DialWithDialer(dialer, dialProtocol, dialTarget, tlsConfig)
 }
 
-func ProbeTCP(ctx context.Context, target string, module config.Module, query_name string, registry *prometheus.Registry, logger log.Logger) bool {
+func ProbeTCP(ctx context.Context, target string, module config.Module, queryName string, registry *prometheus.Registry, logger log.Logger) bool {
 	probeSSLEarliestCertExpiry := prometheus.NewGauge(sslEarliestCertExpiryGaugeOpts)
 	probeSSLLastChainExpiryTimestampSeconds := prometheus.NewGauge(sslChainExpiryInTimeStampGaugeOpts)
 	probeSSLLastInformation := prometheus.NewGaugeVec(

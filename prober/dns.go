@@ -124,7 +124,7 @@ func validRcode(rcode int, valid []string, logger log.Logger) bool {
 	return false
 }
 
-func ProbeDNS(ctx context.Context, target string, module config.Module, query_name string, registry *prometheus.Registry, logger log.Logger) bool {
+func ProbeDNS(ctx context.Context, target string, module config.Module, queryName string, registry *prometheus.Registry, logger log.Logger) bool {
 	var dialProtocol string
 	probeDNSDurationGaugeVec := prometheus.NewGaugeVec(prometheus.GaugeOpts{
 		Name: "probe_dns_duration_seconds",
@@ -257,9 +257,9 @@ func ProbeDNS(ctx context.Context, target string, module config.Module, query_na
 	msg.Id = dns.Id()
 	msg.RecursionDesired = module.DNS.Recursion
 	msg.Question = make([]dns.Question, 1)
-	msg.Question[0] = dns.Question{dns.Fqdn(query_name), qt, qc}
+	msg.Question[0] = dns.Question{dns.Fqdn(queryName), qt, qc}
 
-	level.Info(logger).Log("msg", "Making DNS query", "target", targetIP, "dial_protocol", dialProtocol, "query", query_name, "type", qt, "class", qc)
+	level.Info(logger).Log("msg", "Making DNS query", "target", targetIP, "dial_protocol", dialProtocol, "query", queryName, "type", qt, "class", qc)
 	timeoutDeadline, _ := ctx.Deadline()
 	client.Timeout = time.Until(timeoutDeadline)
 	requestStart := time.Now()
